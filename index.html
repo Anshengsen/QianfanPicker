@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>千帆拾色 - 在线图片取色，智能提取配色方案</title>
-    <link rel="icon" type="image/svg+xml" href="/icon/千帆拾色.svg" />
+    <link rel="icon" type="image/svg+xml" href="icon/千帆拾色.svg" />
     <meta name="description" content="千帆拾色是一个免费的在线图片颜色提取工具。上传任何图片，即可快速获取主色调和完整的配色方案，为你的设计和创意项目提供灵感。">
-    <meta name="keywords" content="图片取色, 颜色提取, 配色方案, 调色板, 在线工具, 设计灵感, HEX, RGB, Color Picker, Palette Generator">
+    <meta name="keywords" content="图片取色, 颜色提取, 配色方案, 调色板, 在线工具, 设计灵感, HEX, RGB, Color Picker, Palette Generator, 粘贴图片取色, 屏幕吸色">
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
     <header>
-        <a href="/" class="logo-link">
-            <img src="/icon/千帆拾色.svg" alt="千帆拾色 Logo" class="logo-img">
+        <a href="./" class="logo-link">
+            <img src="icon/千帆拾色.svg" alt="千帆拾色 Logo" class="logo-img">
             <h1>千帆拾色</h1>
         </a>
         <nav id="mainNav"></nav>
@@ -23,11 +23,12 @@
                     <span>旗下产品</span>
                 </button>
                 <ul class="category-list product-list">
-                    <li><a href="#" class="category-btn active">千帆拾色</a></li>
-                    <li><a href="#" target="_blank" rel="noopener noreferrer" class="category-btn">千帆色卡</a></li>
-                    <li><a href="#" target="_blank" rel="noopener noreferrer" class="category-btn">千帆创意</a></li>
-                    <li><a href="#" target="_blank" rel="noopener noreferrer" class="category-btn">千帆壁纸</a></li>
-                    <li><a href="#" target="_blank" rel="noopener noreferrer" class="category-btn">千帆导航</a></li>
+                    <li><a href="https://anshengsen.github.io/QianfanPicker/" class="category-btn active">千帆拾色</a></li>
+                    <li><a href="https://anshengsen.github.io/QianfanColor/" target="_blank" rel="noopener noreferrer" class="category-btn">千帆色卡</a></li>
+                    <li><a href="https://anshengsen.github.io/QianfanCreative/" target="_blank" rel="noopener noreferrer" class="category-btn">千帆创意</a></li>
+                    <li><a href="https://anshengsen.github.io/QianfanTag/" target="_blank" rel="noopener noreferrer" class="category-btn">千帆标签</a></li>
+                    <li><a href="https://anshengsen.github.io/QianfanWallpaper/" target="_blank" rel="noopener noreferrer" class="category-btn">千帆壁纸</a></li>
+                    <li><a href="https://anshengsen.github.io/QianfanNav/" target="_blank" rel="noopener noreferrer" class="category-btn">千帆导航</a></li>
                 </ul>
             </li>
         </ul>
@@ -44,10 +45,15 @@
         <div id="picker-container">
             <div id="image-uploader">
                 <div class="upload-area" id="upload-area">
-                    <img src="" alt="Uploaded Image" class="hidden" id="uploaded-image">
+                    <canvas id="image-canvas" class="hidden"></canvas>
+                    <div id="loupe" class="hidden">
+                        <div id="loupe-color"></div>
+                        <div id="loupe-text">#000000</div>
+                    </div>
+                    <div id="copy-notification" class="hidden"></div>
                     <div class="upload-prompt" id="upload-prompt">
                         <svg class="upload-icon" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
-                        <p class="prompt-text">点击上传或拖拽图片到这里</p>
+                        <p class="prompt-text">点击或拖拽图片到此，或直接粘贴</p>
                         <p class="prompt-subtext">图片仅在浏览器中处理，不会上传到服务器</p>
                         <button class="upload-button" id="upload-button">选择文件</button>
                     </div>
@@ -58,7 +64,7 @@
             <div id="palette-display">
                 <div class="palette-placeholder" id="palette-placeholder">
                     <h2>等待图片...</h2>
-                    <p>上传图片后，这里将展示提取的配色方案，结果仅供参考。</p>
+                    <p>上传图片后，这里将展示提取的配色方案。移动鼠标到图片上可吸取精确色值，点击即可复制。</p>
                 </div>
                 <div class="palette-results hidden" id="palette-results">
                     <div class="dominant-color-section">
@@ -66,7 +72,13 @@
                         <div class="color-card dominant-card" id="dominant-color"></div>
                     </div>
                     <div class="palette-section">
-                        <h3>配色方案</h3>
+                        <div class="palette-header">
+                            <h3>配色方案</h3>
+                             <div class="palette-controls">
+                                <label for="palette-size">数量: <span id="palette-size-value">8</span></label>
+                                <input type="range" id="palette-size" min="4" max="8" step="2" value="8">
+                            </div>
+                        </div>
                         <div class="color-grid" id="palette-grid"></div>
                     </div>
                 </div>
@@ -79,19 +91,19 @@
           <div class="donation-section">
             <span class="donation-title">如果本站能给您带来帮助，欢迎请我们喝杯咖啡~</span>
             <div class="donation-item wechat-donate">
-              <img src="/icon/微信.png" alt="微信打赏" class="donation-icon">
+              <img src="icon/微信.png" alt="微信打赏" class="donation-icon">
               <div class="wechat-qr-popup">
-                <img src="/icon/微信打赏.png" alt="微信支付二维码">
+                <img src="icon/微信打赏.png" alt="微信支付二维码">
               </div>
             </div>
             <div class="donation-item">
               <a href="https://afdian.com/a/DreamLab" target="_blank" rel="noopener noreferrer">
-                <img src="/icon/爱发电.png" alt="爱发电" class="donation-icon">
+                <img src="icon/爱发电.png" alt="爱发电" class="donation-icon">
               </a>
             </div>
             <div class="donation-item">
               <a href="https://paypal.me/AnShengsen" target="_blank" rel="noopener noreferrer">
-                <img src="/icon/paypal.svg" alt="PayPal" class="donation-icon">
+                <img src="icon/paypal.svg" alt="PayPal" class="donation-icon">
               </a>
             </div>
           </div>
@@ -109,25 +121,25 @@
       <ul class="sidebar-list">
         <li class="sidebar-item">
           <a href="javascript:void(0);" class="sidebar-link">
-            <img src="/icon/微信.png" alt="微信客服" class="sidebar-icon">
+            <img src="icon/微信.png" alt="微信客服" class="sidebar-icon">
           </a>
           <div class="qr-popup">
-            <img src="/icon/微信关注.png" alt="微信二维码">
+            <img src="icon/微信关注.png" alt="微信二维码">
             <span>微信</span>
           </div>
         </li>
         <li class="sidebar-item">
           <a href="javascript:void(0);" class="sidebar-link">
-            <img src="/icon/抖音.png" alt="抖音" class="sidebar-icon">
+            <img src="icon/抖音.png" alt="抖音" class="sidebar-icon">
           </a>
           <div class="qr-popup">
-            <img src="/icon/抖音关注.png" alt="抖音二维码">
+            <img src="icon/抖音关注.png" alt="抖音二维码">
             <span>抖音</span>
           </div>
         </li>
         <li class="sidebar-item">
           <a href="https://www.xiaohongshu.com/user/profile/6123bdb4000000000101c43b" target="_blank" rel="noopener noreferrer" class="sidebar-link">
-            <img src="/icon/小红书.png" alt="小红书" class="sidebar-icon">
+            <img src="icon/小红书.png" alt="小红书" class="sidebar-icon">
           </a>
           <div class="tooltip">
             <span>小红书</span>
@@ -135,7 +147,7 @@
         </li>
         <li class="sidebar-item">
           <a href="https://afdian.com/a/DreamLab" target="_blank" rel="noopener noreferrer" class="sidebar-link">
-            <img src="/icon/爱发电.png" alt="爱发电" class="sidebar-icon">
+            <img src="icon/爱发电.png" alt="爱发电" class="sidebar-icon">
           </a>
           <div class="tooltip">
             <span>爱发电</span>
@@ -143,7 +155,7 @@
         </li>
         <li class="sidebar-item">
           <a href="https://tawk.to/chat/670231c0256fb1049b1dd270/1i9ge1cpl" target="_blank" rel="noopener noreferrer" class="sidebar-link">
-            <img src="/icon/tawk.png" alt="联系客服" class="sidebar-icon">
+            <img src="icon/tawk.png" alt="联系客服" class="sidebar-icon">
           </a>
           <div class="tooltip">
             <span>联系客服</span>
